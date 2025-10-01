@@ -1,163 +1,166 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <title>AR Ad – Multiple Video Options</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AR Video Try-On</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <style>
-    html, body {
-      margin: 0; padding: 0; overflow: hidden; background: #000;
-    }
-    #cam {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-    }
-    #ad {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 12px;
-      border: 2px solid #fff;
-      display: none;
-      z-index: 5;
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
       background: #000;
     }
-    #ppBtn {
+
+    #logo {
       position: absolute;
-      top: calc(50% + 140px); left: 50%;
-      transform: translateX(-50%);
-      padding: 8px 12px;
-      font-size: 20px;
-      border: none;
-      border-radius: 50%;
-      background: #fff;
-      color: #000;
-      cursor: pointer;
-      z-index: 10;
-      box-shadow: 0 0 12px rgba(0,0,0,.6);
-      display: none;
+      top: 16px;
+      left: 16px;
+      width: 100px;
+      z-index: 100;
     }
 
-    /* Care Buttons */
-    .care-buttons {
+    .button-panel {
       position: absolute;
-      bottom: 90px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px 25px;
-      justify-content: center;
-      max-width: 95%;
-      z-index: 10;
-    }
-    .care-buttons button {
-      background: #b22222;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .care-buttons button:hover {
-      background: #8b1a1a;
+      display: none;
+      z-index: 100;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
     }
 
-    /* Logo Button */
-    .logo-btn {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      z-index: 20;
-      background: transparent;
+    .plan-button {
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: bold;
       border: none;
+      border-radius: 8px;
+      background-color: #5E0F8B;
+      color: #fff;
       cursor: pointer;
+      min-width: 120px;
+      transition: background 0.3s;
     }
-    .logo-btn img {
-      width: 60px;
-      height: auto;
-      object-fit: contain;
+
+    .plan-button:hover {
+      background-color: #7a17b8;
+    }
+
+    .a-enter-vr-button {
+      display: none !important;
     }
   </style>
 </head>
 <body>
 
-<!-- Logo Button -->
-<a href="index.html" class="logo-btn" title="Home">
-  <img src="logo.png" alt="Logo">
-</a>
+  <!-- Logo -->
+  <img src="logo.png" id="logo" alt="Logo">
 
-<video id="cam" autoplay muted playsinline></video>
-<video id="ad" playsinline loop></video>
-<button id="ppBtn" title="Play/Pause">▶️</button>
+  <!-- Buttons -->
+  <div class="button-panel" id="planButtons">
+    <button class="plan-button" data-video="#diamondVideo">Diamond Care</button>
+    <button class="plan-button" data-video="#goldVideo">Gold Care</button>
+    <button class="plan-button" data-video="#gemstoneVideo">Gemstone Care</button>
+    <button class="plan-button" data-video="#platinumVideo">Platinum Care</button>
+    <button class="plan-button" data-video="#pearlVideo">Pearl Care</button>
+    <button class="plan-button" data-video="#silverVideo">Silver Care</button>
+  </div>
 
-<!-- Care Buttons -->
-<div class="care-buttons">
-  <button data-src="advertisement/diamond.mp4">Diamond Care</button>
-  <button data-src="advertisement/gold.mp4">Gold Care</button>
-  <button data-src="advertisement/gemstone.mp4">Gemstone Care</button>
-  <button data-src="advertisement/platinum.mp4">Platinum Care</button>
-  <button data-src="advertisement/pearl.mp4">Pearl Care</button>
-  <button data-src="advertisement/silver.mp4">Silver Care</button>
-</div>
+  <!-- AR Scene -->
+  <a-scene 
+    mindar-image="imageTargetSrc: ./targets.mind" 
+    color-space="sRGB" 
+    renderer="colorManagement: true, physicallyCorrectLights, antialias: true" 
+    vr-mode-ui="enabled: false" 
+    device-orientation-permission-ui="enabled: false">
 
-<script>
-  const btn = document.getElementById('ppBtn');
-  const ad = document.getElementById('ad');
-  const cam = document.getElementById('cam');
-  const careButtons = document.querySelectorAll('.care-buttons button');
+    <a-assets>
+      <video id="diamondVideo" src="diamond.mp4" playsinline preload="auto" loop></video>
+      <video id="goldVideo" src="gold.mp4" playsinline preload="auto" loop></video>
+      <video id="gemstoneVideo" src="gemstone.mp4" playsinline preload="auto" loop></video>
+      <video id="platinumVideo" src="platinum.mp4" playsinline preload="auto" loop></video>
+      <video id="pearlVideo" src="pearl.mp4" playsinline preload="auto" loop></video>
+      <video id="silverVideo" src="silver.mp4" playsinline preload="auto" loop></video>
+    </a-assets>
 
-  let videoLoaded = false;
-  let currentVideoSrc = '';
-  let isPlaying = false;
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-    .then(stream => {
-      cam.srcObject = stream;
-    })
-    .catch(err => alert('Camera error: ' + err));
+    <a-entity id="target1" mindar-image-target="targetIndex: 0">
+      <a-plane 
+        id="videoDisplay" 
+        position="0 0 0" 
+        width="1" 
+        height="0.56" 
+        material="shader: flat">
+      </a-plane>
+    </a-entity>
+  </a-scene>
 
-  careButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const src = button.dataset.src;
-      if (src !== currentVideoSrc) {
-        currentVideoSrc = src;
-        ad.src = src;
-        ad.load();
-        ad.volume = 1;
-        videoLoaded = true;
-        ad.style.display = 'block';
-        ad.play();
-        isPlaying = true;
-        btn.innerText = '⏸️';
-        btn.style.display = 'block';
+  <script>
+    const videoDisplay = document.querySelector('#videoDisplay');
+    const target = document.querySelector('#target1');
+    const buttonsContainer = document.querySelector('#planButtons');
+    const buttons = document.querySelectorAll('.plan-button');
+    let currentVideo = null;
+
+    // Show buttons when target is found
+    target.addEventListener('targetFound', () => {
+      buttonsContainer.style.display = 'grid';
+    });
+
+    // Hide & pause videos when target is lost
+    target.addEventListener('targetLost', () => {
+      buttonsContainer.style.display = 'none';
+      if (currentVideo) {
+        currentVideo.pause();
       }
     });
-  });
 
-  btn.addEventListener('click', () => {
-    if (!videoLoaded) return;
-    if (ad.paused) {
-      ad.play().then(() => {
-        btn.innerText = '⏸️';
-        isPlaying = true;
-      }).catch(e => {
-        alert('Playback failed: ' + e.message);
+    // Handle button clicks
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const videoId = btn.getAttribute('data-video');
+        const videoEl = document.querySelector(videoId);
+
+        // Stop current video if another is playing
+        if (currentVideo && currentVideo !== videoEl) {
+          currentVideo.pause();
+          currentVideo.currentTime = 0;
+        }
+
+        // Toggle play/pause
+        if (videoEl.paused) {
+          videoDisplay.setAttribute('material', 'src', videoId);
+          videoEl.play();
+          currentVideo = videoEl;
+        } else {
+          videoEl.pause();
+        }
       });
-    } else {
-      ad.pause();
-      btn.innerText = '▶️';
-      isPlaying = false;
-    }
-  });
-</script>
+    });
 
+    /* 🚫 Disable Right-click */
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    /* 🚫 Disable Inspect Element & Common Dev Shortcuts */
+    document.addEventListener("keydown", (e) => {
+      if (
+        e.key === "F12" || 
+        (e.ctrlKey && e.shiftKey && e.key === "I") || 
+        (e.ctrlKey && e.shiftKey && e.key === "J") || 
+        (e.ctrlKey && e.key === "u") || 
+        (e.ctrlKey && e.shiftKey && e.key === "C")
+      ) {
+        e.preventDefault();
+        alert("🚫 Action Disabled!");
+      }
+    });
+  </script>
 </body>
 </html>
+```

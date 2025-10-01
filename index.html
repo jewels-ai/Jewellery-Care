@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>AR Ad – Multiple Video Options</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <style>
+    html, body {
+      margin: 0; padding: 0; overflow: hidden; background: #000;
+    }
+    #cam {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    #ad {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 12px;
+      border: 2px solid #fff;
+      display: none;
+      z-index: 5;
+      background: #000;
+    }
+    #ppBtn {
+      position: absolute;
+      top: calc(50% + 140px); left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 12px;
+      font-size: 20px;
+      border: none;
+      border-radius: 50%;
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 0 12px rgba(0,0,0,.6);
+      display: none;
+    }
+
+    /* Care Buttons */
+    .care-buttons {
+      position: absolute;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px 25px;
+      justify-content: center;
+      max-width: 95%;
+      z-index: 10;
+    }
+    .care-buttons button {
+      background: #b22222;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .care-buttons button:hover {
+      background: #8b1a1a;
+    }
+
+    /* Logo Button */
+    .logo-btn {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 20;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+    .logo-btn img {
+      width: 60px;
+      height: auto;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Logo Button -->
+<a href="index.html" class="logo-btn" title="Home">
+  <img src="logo.png" alt="Logo">
+</a>
+
+<video id="cam" autoplay muted playsinline></video>
+<video id="ad" playsinline loop></video>
+<button id="ppBtn" title="Play/Pause">▶️</button>
+
+<!-- Care Buttons -->
+<div class="care-buttons">
+  <button data-src="advertisement/diamond.mp4">Diamond Care</button>
+  <button data-src="advertisement/gold.mp4">Gold Care</button>
+  <button data-src="advertisement/gemstone.mp4">Gemstone Care</button>
+  <button data-src="advertisement/platinum.mp4">Platinum Care</button>
+  <button data-src="advertisement/pearl.mp4">Pearl Care</button>
+  <button data-src="advertisement/silver.mp4">Silver Care</button>
+</div>
+
+<script>
+  const btn = document.getElementById('ppBtn');
+  const ad = document.getElementById('ad');
+  const cam = document.getElementById('cam');
+  const careButtons = document.querySelectorAll('.care-buttons button');
+
+  let videoLoaded = false;
+  let currentVideoSrc = '';
+  let isPlaying = false;
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(stream => {
+      cam.srcObject = stream;
+    })
+    .catch(err => alert('Camera error: ' + err));
+
+  careButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const src = button.dataset.src;
+      if (src !== currentVideoSrc) {
+        currentVideoSrc = src;
+        ad.src = src;
+        ad.load();
+        ad.volume = 1;
+        videoLoaded = true;
+        ad.style.display = 'block';
+        ad.play();
+        isPlaying = true;
+        btn.innerText = '⏸️';
+        btn.style.display = 'block';
+      }
+    });
+  });
+
+  btn.addEventListener('click', () => {
+    if (!videoLoaded) return;
+    if (ad.paused) {
+      ad.play().then(() => {
+        btn.innerText = '⏸️';
+        isPlaying = true;
+      }).catch(e => {
+        alert('Playback failed: ' + e.message);
+      });
+    } else {
+      ad.pause();
+      btn.innerText = '▶️';
+      isPlaying = false;
+    }
+  });
+</script>
+
+</body>
+</html>
